@@ -55,7 +55,7 @@ namespace BikeStore_API.Repository.Repositories
 
         public void Update(T entity)
         {
-            throw new NotImplementedException();
+            _db.Update(entity);
         }
     }
 }
