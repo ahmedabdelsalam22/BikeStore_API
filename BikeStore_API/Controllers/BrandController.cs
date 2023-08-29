@@ -17,5 +17,16 @@ namespace BikeStore_API.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("Brands")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllBrands()
+        {
+           var brands = await _unitOfWork.brandRepository.GetAll();
+            if (brands == null) 
+            {
+                return NotFound("No brands founds");
+            }
+           return Ok(brands);
+        }
     }
 }
