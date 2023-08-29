@@ -39,9 +39,18 @@ namespace BikeStore_API.Repository.Repositories
             return await query.FirstOrDefaultAsync();
         }
 
-        public Task<List<T>> GetAll(Expression<Func<T, bool>>? filter = null, bool tracked = true)
+        public async Task<List<T>> GetAll(Expression<Func<T, bool>>? filter = null, bool tracked = true)
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = _dbset;
+            if (filter !=null)
+            {
+                query = query.Where(filter);
+            }
+            if (!tracked)
+            {
+                query = query.AsNoTracking();
+            }
+            return await query.ToListAsync();
         }
 
         public void Update(T entity)
