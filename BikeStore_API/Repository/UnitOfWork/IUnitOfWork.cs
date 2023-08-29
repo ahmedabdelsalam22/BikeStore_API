@@ -4,6 +4,7 @@ namespace BikeStore_API.Repository.UnitOfWork
 {
     public interface IUnitOfWork
     {
+        Task Save();
         public IBrandRepository brandRepository { get; }
     }
 }

@@ -13,5 +13,10 @@ namespace BikeStore_API.Repository.UnitOfWork
             brandRepository = new BrandRepository(_db);
         }
         public IBrandRepository brandRepository { get; private set; }
+
+        public async Task Save()
+        {
+            await _db.SaveChangesAsync();
+        }
     }
 }
