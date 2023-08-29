@@ -22,15 +22,20 @@ namespace BikeStore_API.Repository.Repositories
 
         public void Delete(T entity)
         {
-            throw new NotImplementedException();
+            _dbset.Remove(entity);
         }
 
-        public Task<T> Get(Expression<Func<T, bool>>? filter = null)
+        public async Task<T> Get(Expression<Func<T, bool>>? filter = null, bool tracked = true)
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = _dbset;
+            if (filter != null) 
+            {
+                query = query.Where(filter);
+            }
+            return await query.FirstOrDefaultAsync();
         }
 
-        public Task<List<T>> GetAll(Expression<Func<T, bool>>? filter = null)
+        public Task<List<T>> GetAll(Expression<Func<T, bool>>? filter = null, bool tracked = true)
         {
             throw new NotImplementedException();
         }
