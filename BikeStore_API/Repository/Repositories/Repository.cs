@@ -15,29 +15,47 @@ namespace BikeStore_API.Repository.Repositories
             _dbset = _db.Set<T>();
         }
 
-        public void Create(T entity)
+        public async Task Create(T entity)
         {
-            throw new NotImplementedException();
+           await _dbset.AddAsync(entity);
         }
 
         public void Delete(T entity)
         {
-            throw new NotImplementedException();
+            _dbset.Remove(entity);
         }
 
-        public Task<T> Get(Expression<Func<T, bool>>? filter = null)
+        public async Task<T> Get(Expression<Func<T, bool>>? filter = null, bool tracked = true)
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = _dbset;
+            if (filter != null) 
+            {
+                query = query.Where(filter);
+            }
+            if (!tracked) 
+            {
+                query = query.AsNoTracking();
+            }
+            return await query.FirstOrDefaultAsync();
         }
 
-        public Task<List<T>> GetAll(Expression<Func<T, bool>>? filter = null)
+        public async Task<List<T>> GetAll(Expression<Func<T, bool>>? filter = null, bool tracked = true)
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = _dbset;
+            if (filter !=null)
+            {
+                query = query.Where(filter);
+            }
+            if (!tracked)
+            {
+                query = query.AsNoTracking();
+            }
+            return await query.ToListAsync();
         }
 
         public void Update(T entity)
         {
-            throw new NotImplementedException();
+            _db.Update(entity);
         }
     }
 }
