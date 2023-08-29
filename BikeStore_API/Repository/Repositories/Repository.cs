@@ -1,6 +1,7 @@
 ﻿using BikeStore_API.Models;
 using BikeStore_API.Repository.IRepositories;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace BikeStore_API.Repository.Repositories
 {
@@ -13,32 +14,30 @@ namespace BikeStore_API.Repository.Repositories
             _db = db;
             _dbset = _db.Set<T>();
         }
-        public void Create()
+
+        public void Create(T entity)
         {
             throw new NotImplementedException();
         }
 
-        public void Delete()
+        public void Delete(T entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<T> Get(System.Linq.Expressions.Expression<Func<T, bool>>? filter = null)
+        public Task<T> Get(Expression<Func<T, bool>>? filter = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<T>> GetAll(System.Linq.Expressions.Expression<Func<T, bool>>? filter = null)
+        public Task<List<T>> GetAll(Expression<Func<T, bool>>? filter = null)
         {
             throw new NotImplementedException();
         }
 
-        public void Update()
+        public void Update(T entity)
         {
             throw new NotImplementedException();
         }
-    }
-: class
-    {
     }
 }
