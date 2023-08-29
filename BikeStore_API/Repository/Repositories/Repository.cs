@@ -32,6 +32,10 @@ namespace BikeStore_API.Repository.Repositories
             {
                 query = query.Where(filter);
             }
+            if (!tracked) 
+            {
+                query = query.AsNoTracking();
+            }
             return await query.FirstOrDefaultAsync();
         }
 
