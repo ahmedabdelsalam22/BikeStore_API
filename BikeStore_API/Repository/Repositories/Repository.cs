@@ -25,7 +25,7 @@ namespace BikeStore_API.Repository.Repositories
             _dbset.Remove(entity);
         }
 
-        public async Task<T> Get(Expression<Func<T, bool>>? filter = null, bool tracked = true)
+        public async Task<T> Get(Expression<Func<T, bool>>? filter = null, bool tracked = true, string[]? includes = null)
         {
             IQueryable<T> query = _dbset;
             if (filter != null) 
@@ -36,10 +36,17 @@ namespace BikeStore_API.Repository.Repositories
             {
                 query = query.AsNoTracking();
             }
+            if (includes != null) 
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<List<T>> GetAll(Expression<Func<T, bool>>? filter = null, bool tracked = true)
+        public async Task<List<T>> GetAll(Expression<Func<T, bool>>? filter = null, bool tracked = true, string[]? includes = null)
         {
             IQueryable<T> query = _dbset;
             if (filter !=null)
@@ -49,6 +56,13 @@ namespace BikeStore_API.Repository.Repositories
             if (!tracked)
             {
                 query = query.AsNoTracking();
+            }
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
             }
             return await query.ToListAsync();
         }
