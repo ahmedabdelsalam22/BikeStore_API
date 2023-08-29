@@ -1,4 +1,7 @@
 using BikeStore_API.Models;
+using BikeStore_API.Repository.IRepositories;
+using BikeStore_API.Repository.Repositories;
+using BikeStore_API.Repository.UnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<BikeStoresContext>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 
 var app = builder.Build();
 
