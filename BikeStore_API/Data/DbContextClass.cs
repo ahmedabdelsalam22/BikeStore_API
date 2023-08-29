@@ -7,6 +7,5 @@ namespace BikeStore_API.Data
         public DbContextClass(DbContextOptions options) : base(options)
         {
         }
-
     }
 }
