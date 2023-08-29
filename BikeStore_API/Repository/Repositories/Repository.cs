@@ -15,9 +15,9 @@ namespace BikeStore_API.Repository.Repositories
             _dbset = _db.Set<T>();
         }
 
-        public void Create(T entity)
+        public async Task Create(T entity)
         {
-            throw new NotImplementedException();
+           await _dbset.AddAsync(entity);
         }
 
         public void Delete(T entity)
