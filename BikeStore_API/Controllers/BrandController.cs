@@ -83,7 +83,7 @@ namespace BikeStore_API.Controllers
         }
 
         [HttpPost("Create")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> CreateBrand([FromBody] BrandCreateDTO brandCreateDTO)
@@ -104,7 +104,7 @@ namespace BikeStore_API.Controllers
                 await _unitOfWork.Save();
 
                 _ApiResposne.IsSuccess = true;
-                _ApiResposne.StatusCode = HttpStatusCode.OK;
+                _ApiResposne.StatusCode = HttpStatusCode.Created;
                 return _ApiResposne;
             }
             catch (Exception ex)
@@ -149,6 +149,38 @@ namespace BikeStore_API.Controllers
 
                 _ApiResposne.IsSuccess = true;
                 _ApiResposne.StatusCode = HttpStatusCode.OK;
+                return _ApiResposne;
+            }
+            catch (Exception ex)
+            {
+                _ApiResposne.IsSuccess = false;
+                _ApiResposne.StatusCode = HttpStatusCode.BadRequest;
+                _ApiResposne.ErrorMessages = new List<string>() { ex.ToString() };
+                return _ApiResposne;
+            }
+        }
+        [HttpDelete("brand{brandId}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<ActionResult<APIResponse>> DeleteBrand(int? brandId) 
+        {
+            try 
+            {
+                if (brandId == 0 || brandId == null)
+                {
+                    return BadRequest();
+                }
+                Brand? brand = await _unitOfWork.brandRepository.Get(filter: x => x.BrandId == brandId);
+                if (brand == null) 
+                {
+                    return NotFound();
+                }
+                _unitOfWork.brandRepository.Delete(brand);
+                await _unitOfWork.Save();
+
+                _ApiResposne.IsSuccess = true;
+                _ApiResposne.StatusCode = HttpStatusCode.NoContent;
                 return _ApiResposne;
             }
             catch (Exception ex)
