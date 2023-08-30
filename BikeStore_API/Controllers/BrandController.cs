@@ -65,12 +65,51 @@ namespace BikeStore_API.Controllers
                 Brand? brand = await _unitOfWork.brandRepository.Get(filter:x=>x.BrandId == brandId);
                 if (brand == null) 
                 {
-                    return NotFound("no brand exists with this id");
+                    return NotFound("no brandUpdateDTO exists with this id");
                 }
                 BrandDTO brandDTO = _mapper.Map<BrandDTO>(brand);
                 _ApiResposne.IsSuccess = true;
                 _ApiResposne.StatusCode = HttpStatusCode.OK;
                 _ApiResposne.Result = brandDTO;
+                return _ApiResposne;
+            }
+            catch (Exception ex)
+            {
+                _ApiResposne.IsSuccess = false;
+                _ApiResposne.StatusCode = HttpStatusCode.BadRequest;
+                _ApiResposne.ErrorMessages = new List<string>() { ex.ToString() };
+                return _ApiResposne;
+            }
+        }
+        [HttpPut("Update{brandId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<APIResponse>> UpdateBrand(int? brandId, [FromBody] BrandUpdateDTO brandUpdateDTO)
+        {
+            try 
+            {
+                if (brandId == 0 || brandId == null)
+                {
+                    return BadRequest();
+                }
+                if (brandUpdateDTO == null)
+                {
+                    return BadRequest();
+                }
+                Brand? brandIsExists = await _unitOfWork.brandRepository.Get(filter: x => x.BrandId == brandId);
+                if (brandIsExists == null)
+                {
+                    return NotFound("no brandUpdateDTO exists with this id");
+                }
+
+                Brand brandToDb = _mapper.Map<Brand>(brandUpdateDTO);
+
+                _unitOfWork.brandRepository.Update(brandToDb);
+                await _unitOfWork.Save();
+
+                _ApiResposne.IsSuccess = true;
+                _ApiResposne.StatusCode = HttpStatusCode.OK;
                 return _ApiResposne;
             }
             catch (Exception ex)
