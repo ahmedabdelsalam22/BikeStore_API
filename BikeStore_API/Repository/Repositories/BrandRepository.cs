@@ -13,7 +13,7 @@ namespace BikeStore_API.Repository.Repositories
 
         public void Update(Brand brand)
         {
-            _context.Update(brand);
+            _context.Brands.Update(brand);
         }
     }
 }
