@@ -132,15 +132,14 @@ namespace BikeStore_API.Controllers
                 {
                     return BadRequest();
                 }
-                if (brandId != brandUpdateDTO.BrandId) 
-                {
-                    return BadRequest();
-                }
-                Brand? brandIsExists = await _unitOfWork.brandRepository.Get(filter: x => x.BrandId == brandId);
+                 
+                Brand? brandIsExists = await _unitOfWork.brandRepository.Get(filter: x => x.BrandId == brandId, tracked: false);
                 if (brandIsExists == null)
                 {
                     return NotFound("no brand exists with this id");
                 }
+
+                brandUpdateDTO.BrandId = (int) brandId;
 
                 Brand brandToDb = _mapper.Map<Brand>(brandUpdateDTO);
 
