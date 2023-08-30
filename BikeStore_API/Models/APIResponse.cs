@@ -7,6 +7,6 @@ namespace BikeStore_API.Models
         public HttpStatusCode StatusCode { get; set; }
         public List<string>? ErrorMessages { get; set; } = null;
         public bool IsSuccess { get; set; }
-        public List<Object>? Result { get; set; }
+        public Object Result { get; set; }
     }
 }
