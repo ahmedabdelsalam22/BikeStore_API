@@ -30,7 +30,7 @@ namespace BikeStore_API.Controllers
         {
             try 
             {
-                List<Brand>? brands = await _unitOfWork.brandRepository.GetAll();
+                List<Brand>? brands = await _unitOfWork.brandRepository.GetAll(tracked:false);
                 if (brands == null)
                 {
                     return NotFound("No brands founds");
@@ -47,6 +47,37 @@ namespace BikeStore_API.Controllers
                 _ApiResposne.IsSuccess = false;
                 _ApiResposne.StatusCode = HttpStatusCode.BadRequest;
                 _ApiResposne.ErrorMessages = new List<string>() { ex.ToString()};
+                return _ApiResposne;
+            }
+        }
+        [HttpGet("Brand{brandId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<APIResponse>> GetBrandById(int? brandId)
+        {
+            try 
+            {
+                if (brandId == 0 || brandId == null) 
+                {
+                    return BadRequest();
+                }
+                Brand? brand = await _unitOfWork.brandRepository.Get(filter:x=>x.BrandId == brandId);
+                if (brand == null) 
+                {
+                    return NotFound("no brand exists with this id");
+                }
+                BrandDTO brandDTO = _mapper.Map<BrandDTO>(brand);
+                _ApiResposne.IsSuccess = true;
+                _ApiResposne.StatusCode = HttpStatusCode.OK;
+                _ApiResposne.Result = brandDTO;
+                return _ApiResposne;
+            }
+            catch (Exception ex)
+            {
+                _ApiResposne.IsSuccess = false;
+                _ApiResposne.StatusCode = HttpStatusCode.BadRequest;
+                _ApiResposne.ErrorMessages = new List<string>() { ex.ToString() };
                 return _ApiResposne;
             }
         }
