@@ -8,7 +8,6 @@ namespace BikeStore_API.Repository.IRepositories
         Task<List<T>> GetAll(Expression<Func<T,bool>>? filter = null,bool tracked = true,string[]? includes=null);
         Task<T> Get(Expression<Func<T,bool>>? filter=null, bool tracked = true,string[]? includes = null);
         Task Create(T entity);
-        void Update(T entity);
         void Delete(T entity);
     }
 }
