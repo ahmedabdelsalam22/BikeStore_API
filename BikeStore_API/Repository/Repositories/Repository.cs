@@ -67,9 +67,6 @@ namespace BikeStore_API.Repository.Repositories
             return await query.ToListAsync();
         }
 
-        public void Update(T entity)
-        {
-            _db.Update(entity);
-        }
+      
     }
 }
