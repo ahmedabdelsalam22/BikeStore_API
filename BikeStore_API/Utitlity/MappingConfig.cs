@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using BikeStore_API.DTOS;
+using BikeStore_API.Models;
 
 namespace BikeStore_API.Utitlity
 {
@@ -6,7 +8,7 @@ namespace BikeStore_API.Utitlity
     {
         public MappingConfig()
         {
-
+            CreateMap<Brand,BrandDTO>();
         }
     }
 }
