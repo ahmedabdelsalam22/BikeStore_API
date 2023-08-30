@@ -81,6 +81,36 @@ namespace BikeStore_API.Controllers
                 return _ApiResposne;
             }
         }
+
+        [HttpPost("Create")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<APIResponse>> CreateBrand([FromBody] BrandCreateDTO brandCreateDTO)
+        {
+            try 
+            {
+                if (brandCreateDTO == null)
+                {
+                    return BadRequest();
+                }
+                Brand brandToDb = _mapper.Map<Brand>(brandCreateDTO);
+                await _unitOfWork.brandRepository.Create(brandToDb);
+                await _unitOfWork.Save();
+
+                _ApiResposne.IsSuccess = true;
+                _ApiResposne.StatusCode = HttpStatusCode.OK;
+                return _ApiResposne;
+            }
+            catch (Exception ex)
+            {
+                _ApiResposne.IsSuccess = false;
+                _ApiResposne.StatusCode = HttpStatusCode.BadRequest;
+                _ApiResposne.ErrorMessages = new List<string>() { ex.ToString() };
+                return _ApiResposne;
+            }
+        }
+
         [HttpPut("Update{brandId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
