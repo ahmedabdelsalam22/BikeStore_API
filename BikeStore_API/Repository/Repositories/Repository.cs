@@ -69,7 +69,7 @@ namespace BikeStore_API.Repository.Repositories
 
         public void Update(T entity)
         {
-            _db.Update(entity);
+            _dbset.Update(entity);
         }
     }
 }
