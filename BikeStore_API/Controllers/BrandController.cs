@@ -136,7 +136,7 @@ namespace BikeStore_API.Controllers
                 {
                     return BadRequest();
                 }
-                Brand? brandIsExists = await _unitOfWork.brandRepository.Get(filter: x => x.BrandId == brandId);
+                Brand? brandIsExists = await _unitOfWork.brandRepository.Get(filter: x => x.BrandId == brandId, tracked: false);
                 if (brandIsExists == null)
                 {
                     return NotFound("no brand exists with this id");
