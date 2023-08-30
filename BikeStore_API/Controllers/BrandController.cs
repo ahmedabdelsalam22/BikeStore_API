@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BikeStore_API.DTOS;
 using BikeStore_API.Models;
 using BikeStore_API.Repository.UnitOfWork;
 using Microsoft.AspNetCore.Http;
@@ -34,9 +35,12 @@ namespace BikeStore_API.Controllers
                 {
                     return NotFound("No brands founds");
                 }
+
+                List<BrandDTO> brandsDTOs = _mapper.Map<List<BrandDTO>>(brands);
+
                 _ApiResposne.IsSuccess = true;
                 _ApiResposne.StatusCode = HttpStatusCode.OK;
-                _ApiResposne.Result = brands;
+                _ApiResposne.Result = brandsDTOs;
                 return _ApiResposne;
             }catch(Exception ex) 
             {
