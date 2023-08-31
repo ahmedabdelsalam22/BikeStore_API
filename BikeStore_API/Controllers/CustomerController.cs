@@ -15,7 +15,7 @@ namespace BikeStore_API.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly APIResponse _apiResponse;
         private readonly IMapper _mapper;
-        public CustomerController(IUnitOfWork unitOfWork,IMapper mapper)
+        public CustomerController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -24,9 +24,9 @@ namespace BikeStore_API.Controllers
         [HttpGet("customers")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> GetCustomers() 
+        public async Task<ActionResult<APIResponse>> GetCustomers()
         {
-            try 
+            try
             {
                 List<Customer> customers = await _unitOfWork.customerRepository.GetAll(tracked: false);
                 if (customers == null)
@@ -82,9 +82,9 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<APIResponse>> CreateCustomer([FromBody] CustomerCreateDTO customerCreateDTO) 
+        public async Task<ActionResult<APIResponse>> CreateCustomer([FromBody] CustomerCreateDTO customerCreateDTO)
         {
-            try 
+            try
             {
                 if (customerCreateDTO == null)
                 {
@@ -111,7 +111,31 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
-     
 
+        [HttpPut("update/{customerId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<APIResponse>> UpdateCustomer(int? customerId, [FromBody] CustomerUpdateDTO customerUpdateDTO)
+        {
+            if (customerId == 0 || customerId == null) 
+            {
+                return BadRequest();
+            }
+            if (customerUpdateDTO == null)
+            {
+                return BadRequest();
+            }
+            Customer customerFromDb = await _unitOfWork.customerRepository.Get(filter:x=>x.CustomerId == customerUpdateDTO.CustomerId,tracked:false);
+            if (customerFromDb == null) 
+            {
+                return BadRequest();
+            }
+            customerUpdateDTO.CustomerId = (int) customerId;
+
+            Customer customerToDb = _mapper.Map<Customer>(customerUpdateDTO);
+            _unitOfWork.customerRepository.Update(customerToDb);
+            return Ok();
+        }
     }
 }
