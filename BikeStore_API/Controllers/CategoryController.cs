@@ -50,7 +50,7 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
-        [HttpGet("category{categoryId}")]
+        [HttpGet("category/{categoryId}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> GetCategoryById(int? categoryId) 
@@ -113,5 +113,31 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
+        [HttpPut("update/{categoryId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> UpdateCategory(int? categoryId, [FromBody]CategoryUpdateDTO categoryUpdateDTO )
+        {
+            if (categoryId == 0 || categoryId == null)
+            {
+                return NotFound();
+            }
+            if (categoryUpdateDTO == null) 
+            {
+                return BadRequest();
+            }
+            Category categoryFromDb = await _unitOfWork.categoryRepository.Get(filter:x=>x.CategoryId == categoryId);
+            if (categoryFromDb == null) 
+            {
+                return BadRequest();
+            }
+            categoryUpdateDTO.CategoryId = (int)categoryId;
+            Category categoryToDB = _mapper.Map<Category>(categoryUpdateDTO); 
+            _unitOfWork.categoryRepository.Update(categoryToDB);
+            await _unitOfWork.Save();
+            return Ok();
+        }
+
     }
 }
