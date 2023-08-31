@@ -14,13 +14,14 @@ namespace BikeStore_API.Repository.UnitOfWork
             categoryRepository = new CategoryRepository(_db);
             customerRepository = new CustomerRepository(_db);
             storeRepository = new StoreRepository(_db);
+            partRepository = new PartRepository(_db);
         }
         public IBrandRepository brandRepository { get; private set; }
 
         public ICategoryRepository categoryRepository { get; private set; }
         public ICustomerRepository customerRepository { get; private set; }
-
         public IStoreRepository storeRepository { get; private set; }
+        public IPartRepository partRepository { get; private set; }
 
         public async Task Save()
         {
