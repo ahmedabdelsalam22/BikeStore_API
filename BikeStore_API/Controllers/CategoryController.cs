@@ -50,7 +50,7 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
-        [HttpGet("category/{categoryId}")]
+        [HttpGet("/{categoryId}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> GetCategoryById(int? categoryId) 
@@ -149,6 +149,25 @@ namespace BikeStore_API.Controllers
                 _apiResponse.StatusCode = HttpStatusCode.BadRequest;
                 return _apiResponse;
             }
+        }
+        [HttpDelete("/{categoryId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> DeleteCategory(int? categoryId) 
+        {
+            if (categoryId == 0 || categoryId == null)
+            {
+                return NotFound();
+            }
+            Category categoryFromDb = await _unitOfWork.categoryRepository.Get(filter: x => x.CategoryId == categoryId, tracked: false);
+            if (categoryFromDb == null)
+            {
+                return BadRequest();
+            }
+            _unitOfWork.categoryRepository.Delete(categoryFromDb);
+            await _unitOfWork.Save();
+            return Ok();
         }
 
     }
