@@ -81,5 +81,25 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
+        [HttpPost("create")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<APIResponse>> CreatePart([FromBody] PartCreateDTO partCreateDTO)
+        {
+            if (partCreateDTO == null) 
+            {
+                return BadRequest();
+            }
+            Part partIsExists = await _unitOfWork.partRepository.Get(filter:x=>x.PartName.ToLower() == partCreateDTO.PartName.ToLower(),tracked:false);
+            if (partIsExists != null)
+            {
+                return BadRequest("part already exists");
+            }
+            Part partToDb = _mapper.Map<Part>(partCreateDTO);
+            await _unitOfWork.partRepository.Create(partToDb);
+            await _unitOfWork.Save();
+            return Ok();
+        }
     }
 }

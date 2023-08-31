@@ -2,6 +2,6 @@
 {
     public class PartCreateDTO
     {
-        public string? PartName { get; set; }
+        public string PartName { get; set; }
     }
 }
