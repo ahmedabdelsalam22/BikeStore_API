@@ -84,7 +84,6 @@ namespace BikeStore_API.Controllers
         [HttpPost("create")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-
         public async Task<ActionResult<APIResponse>> CreateCategory([FromBody] CategoryCreateDTO categoryCreateDTO)
         {
             try 
