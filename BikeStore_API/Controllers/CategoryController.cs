@@ -156,18 +156,30 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> DeleteCategory(int? categoryId) 
         {
-            if (categoryId == 0 || categoryId == null)
+            try 
             {
-                return NotFound();
+                if (categoryId == 0 || categoryId == null)
+                {
+                    return BadRequest();
+                }
+                Category categoryFromDb = await _unitOfWork.categoryRepository.Get(filter: x => x.CategoryId == categoryId, tracked: false);
+                if (categoryFromDb == null)
+                {
+                    return BadRequest();
+                }
+                _unitOfWork.categoryRepository.Delete(categoryFromDb);
+                await _unitOfWork.Save();
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                return _apiResponse;
             }
-            Category categoryFromDb = await _unitOfWork.categoryRepository.Get(filter: x => x.CategoryId == categoryId, tracked: false);
-            if (categoryFromDb == null)
+            catch (Exception e)
             {
-                return BadRequest();
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { e.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                return _apiResponse;
             }
-            _unitOfWork.categoryRepository.Delete(categoryFromDb);
-            await _unitOfWork.Save();
-            return Ok();
         }
 
     }
