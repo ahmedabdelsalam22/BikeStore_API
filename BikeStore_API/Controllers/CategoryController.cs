@@ -1,4 +1,6 @@
-﻿using BikeStore_API.Models;
+﻿using AutoMapper;
+using BikeStore_API.DTOS;
+using BikeStore_API.Models;
 using BikeStore_API.Repository.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +13,12 @@ namespace BikeStore_API.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly APIResponse _apiResponse;
-        public CategoryController(IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+        public CategoryController(IUnitOfWork unitOfWork,IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _apiResponse = new APIResponse();
+            _mapper = mapper;
         }
 
         [HttpGet("categories")]
@@ -27,6 +31,7 @@ namespace BikeStore_API.Controllers
             {
                 return NotFound();
             }
+            List<CategoryDTO> categoriesDTO = _mapper.Map<List<CategoryDTO>>(categories);
             return Ok(categories);
         }
 
