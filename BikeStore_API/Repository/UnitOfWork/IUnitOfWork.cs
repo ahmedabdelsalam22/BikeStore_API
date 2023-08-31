@@ -7,5 +7,6 @@ namespace BikeStore_API.Repository.UnitOfWork
         Task Save();
         public IBrandRepository brandRepository { get; }
         public ICategoryRepository categoryRepository { get; }
+        public ICustomerRepository customerRepository { get; }
     }
 }
