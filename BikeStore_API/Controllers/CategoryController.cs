@@ -52,16 +52,34 @@ namespace BikeStore_API.Controllers
         }
         [HttpGet("category{categoryId}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> CategoryById(int? categoryId) 
         {
-            if (categoryId == 0 || categoryId == null) 
+            try
             {
-                return NotFound();
+                if (categoryId == 0 || categoryId == null)
+                {
+                    return NotFound();
+                }
+                Category category = await _unitOfWork.categoryRepository.Get(filter: x => x.CategoryId == categoryId);
+                if (category == null)
+                {
+                    return NotFound();
+                }
+                CategoryDTO categoryDTO = _mapper.Map<CategoryDTO>(category);
+                
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                _apiResponse.Result = categoryDTO;
+                return _apiResponse;
             }
-            Category category = await _unitOfWork.categoryRepository.Get(filter:x=>x.CategoryId == categoryId);
-
-            CategoryDTO categoryDTO = _mapper.Map<CategoryDTO>(category);
-            return Ok(categoryDTO);
+            catch (Exception e) 
+            {
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { e.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                return _apiResponse;
+            }
         }
     }
 }
