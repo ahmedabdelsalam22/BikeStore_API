@@ -127,7 +127,7 @@ namespace BikeStore_API.Controllers
             {
                 return BadRequest();
             }
-            Category categoryFromDb = await _unitOfWork.categoryRepository.Get(filter:x=>x.CategoryId == categoryId);
+            Category categoryFromDb = await _unitOfWork.categoryRepository.Get(filter:x=>x.CategoryId == categoryId,tracked:false);
             if (categoryFromDb == null) 
             {
                 return BadRequest();
