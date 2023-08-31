@@ -26,6 +26,7 @@ namespace BikeStore_API.Utitlity
 
             CreateMap<Part, PartDTO>();
             CreateMap<PartCreateDTO, Part>();
+            CreateMap<PartUpdateDTO, Part>();
         }
     }
 }
