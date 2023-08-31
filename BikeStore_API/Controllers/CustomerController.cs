@@ -47,7 +47,7 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
-        [HttpGet("/{customerId}")]
+        [HttpGet("{customerId}")]
         public async Task<ActionResult<APIResponse>> GetCustomerById(int? customerId)
         {
             if (customerId == 0 || customerId == null) 
