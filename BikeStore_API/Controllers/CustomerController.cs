@@ -47,5 +47,20 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
+        [HttpGet("/{customerId}")]
+        public async Task<ActionResult<APIResponse>> GetCustomerById(int? customerId)
+        {
+            if (customerId == 0 || customerId == null) 
+            {
+                return BadRequest();
+            }
+            Customer customer = await _unitOfWork.customerRepository.Get(filter:x=>x.CustomerId == customerId ,tracked:false);
+            if (customer == null) 
+            {
+                return NotFound();
+            }
+            CustomerDTO customerDTO = _mapper.Map<CustomerDTO>(customer);
+            return Ok(customerDTO);
+        }
     }
 }
