@@ -62,7 +62,7 @@ namespace BikeStore_API.Controllers
                 {
                     return BadRequest();
                 }
-                Brand? brand = await _unitOfWork.brandRepository.Get(filter:x=>x.BrandId == brandId);
+                Brand? brand = await _unitOfWork.brandRepository.Get(filter:x=>x.BrandId == brandId, tracked: false);
                 if (brand == null) 
                 {
                     return NotFound("no brandUpdateDTO exists with this id");
@@ -94,7 +94,7 @@ namespace BikeStore_API.Controllers
                 {
                     return BadRequest();
                 }
-               Brand? isBrandExistsInDb = await _unitOfWork.brandRepository.Get(filter: x => x.BrandName.ToLower() == brandCreateDTO.BrandName.ToLower());
+               Brand? isBrandExistsInDb = await _unitOfWork.brandRepository.Get(filter: x => x.BrandName.ToLower() == brandCreateDTO.BrandName.ToLower(), tracked: false);
                 if (isBrandExistsInDb != null)
                 {
                     return BadRequest("this brand already exists");
