@@ -12,7 +12,7 @@ namespace BikeStore_API.Repository.Repositories
         }
         public void Update(Customer customer) 
         {
-            _db.Customers.Update(customer);
+            _db.Update(customer);
         }
     }
 }
