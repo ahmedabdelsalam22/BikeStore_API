@@ -50,17 +50,29 @@ namespace BikeStore_API.Controllers
         [HttpGet("{customerId}")]
         public async Task<ActionResult<APIResponse>> GetCustomerById(int? customerId)
         {
-            if (customerId == 0 || customerId == null) 
-            {
-                return BadRequest();
+            try {
+                if (customerId == 0 || customerId == null)
+                {
+                    return BadRequest();
+                }
+                Customer customer = await _unitOfWork.customerRepository.Get(filter: x => x.CustomerId == customerId, tracked: false);
+                if (customer == null)
+                {
+                    return NotFound();
+                }
+                CustomerDTO customerDTO = _mapper.Map<CustomerDTO>(customer);
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                _apiResponse.Result = customerDTO;
+                return _apiResponse;
             }
-            Customer customer = await _unitOfWork.customerRepository.Get(filter:x=>x.CustomerId == customerId ,tracked:false);
-            if (customer == null) 
+            catch (Exception ex)
             {
-                return NotFound();
+                _apiResponse.IsSuccess = false;
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                return _apiResponse;
             }
-            CustomerDTO customerDTO = _mapper.Map<CustomerDTO>(customer);
-            return Ok(customerDTO);
         }
     }
 }
