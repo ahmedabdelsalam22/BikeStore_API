@@ -84,19 +84,32 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> CreateCustomer([FromBody] CustomerCreateDTO customerCreateDTO) 
         {
-            if (customerCreateDTO == null) 
+            try 
             {
-                return BadRequest();
+                if (customerCreateDTO == null)
+                {
+                    return BadRequest();
+                }
+                var customerFromDb = await _unitOfWork.customerRepository.Get(filter: x => x.Email.ToLower() == customerCreateDTO.Email.ToLower(), tracked: false);
+                if (customerFromDb != null)
+                {
+                    return BadRequest("this customer already exists");
+                }
+                Customer customerToDb = _mapper.Map<Customer>(customerCreateDTO);
+                await _unitOfWork.customerRepository.Create(customerToDb);
+                await _unitOfWork.Save();
+
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                return _apiResponse;
             }
-            var customerFromDb = await _unitOfWork.customerRepository.Get(filter:x=>x.Email.ToLower() == customerCreateDTO.Email.ToLower(),tracked:false);
-            if (customerFromDb != null)
+            catch (Exception ex)
             {
-                return BadRequest("this customer already exists");
+                _apiResponse.IsSuccess = false;
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                return _apiResponse;
             }
-            Customer customerToDb = _mapper.Map<Customer>(customerCreateDTO);
-            await _unitOfWork.customerRepository.Create(customerToDb);
-            await _unitOfWork.Save();
-            return Ok();
         }
      
 
