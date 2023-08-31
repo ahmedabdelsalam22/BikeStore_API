@@ -113,7 +113,33 @@ namespace BikeStore_API.Controllers
                 _apiResponse.StatusCode = HttpStatusCode.BadRequest;
                 return _apiResponse;
             }
+        }
+        [HttpPut("update/{partId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<APIResponse>> UpdatePart(int? partId, [FromBody]PartUpdateDTO partUpdateDTO)
+        {
+            if (partId == 0 || partId == null)
+            {
+                return BadRequest();
+            }
+            if (partUpdateDTO == null)
+            {
+                return BadRequest();
+            }
+            Part partIsExists = await _unitOfWork.partRepository.Get(filter: x => x.PartId == partId, tracked: false);
+            if (partIsExists != null)
+            {
+                return BadRequest("part already exists");
+            }
 
+            partUpdateDTO.PartId = (int)partId;
+
+            Part partToDb = _mapper.Map<Part>(partUpdateDTO);
+            _unitOfWork.partRepository.Update(partToDb);
+            await _unitOfWork.Save();
+            return Ok();
         }
     }
 }
