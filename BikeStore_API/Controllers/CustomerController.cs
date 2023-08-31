@@ -118,24 +118,37 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> UpdateCustomer(int? customerId, [FromBody] CustomerUpdateDTO customerUpdateDTO)
         {
-            if (customerId == 0 || customerId == null) 
+            try 
             {
-                return BadRequest();
-            }
-            if (customerUpdateDTO == null)
-            {
-                return BadRequest();
-            }
-            Customer customerFromDb = await _unitOfWork.customerRepository.Get(filter:x=>x.CustomerId == customerUpdateDTO.CustomerId,tracked:false);
-            if (customerFromDb == null) 
-            {
-                return BadRequest();
-            }
-            customerUpdateDTO.CustomerId = (int) customerId;
+                if (customerId == 0 || customerId == null)
+                {
+                    return BadRequest();
+                }
+                if (customerUpdateDTO == null)
+                {
+                    return BadRequest();
+                }
+                Customer customerFromDb = await _unitOfWork.customerRepository.Get(filter: x => x.CustomerId == customerUpdateDTO.CustomerId);
+                if (customerFromDb == null)
+                {
+                    return BadRequest();
+                }
+                customerUpdateDTO.CustomerId = (int)customerId;
 
-            Customer customerToDb = _mapper.Map<Customer>(customerUpdateDTO);
-            _unitOfWork.customerRepository.Update(customerToDb);
-            return Ok();
+                Customer customerToDb = _mapper.Map<Customer>(customerUpdateDTO);
+                _unitOfWork.customerRepository.Update(customerToDb);
+                await _unitOfWork.Save();
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                return _apiResponse;
+            }
+            catch (Exception ex)
+            {
+                _apiResponse.IsSuccess = false;
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                return _apiResponse;
+            }
         }
     }
 }
