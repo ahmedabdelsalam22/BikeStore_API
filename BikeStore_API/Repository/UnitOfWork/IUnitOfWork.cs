@@ -8,5 +8,6 @@ namespace BikeStore_API.Repository.UnitOfWork
         public IBrandRepository brandRepository { get; }
         public ICategoryRepository categoryRepository { get; }
         public ICustomerRepository customerRepository { get; }
+        public IStoreRepository storeRepository { get; }
     }
 }
