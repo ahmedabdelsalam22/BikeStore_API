@@ -87,19 +87,33 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> CreatePart([FromBody] PartCreateDTO partCreateDTO)
         {
-            if (partCreateDTO == null) 
+            try 
             {
-                return BadRequest();
+                if (partCreateDTO == null)
+                {
+                    return BadRequest();
+                }
+                Part partIsExists = await _unitOfWork.partRepository.Get(filter: x => x.PartName.ToLower() == partCreateDTO.PartName.ToLower(), tracked: false);
+                if (partIsExists != null)
+                {
+                    return BadRequest("part already exists");
+                }
+                Part partToDb = _mapper.Map<Part>(partCreateDTO);
+                await _unitOfWork.partRepository.Create(partToDb);
+                await _unitOfWork.Save();
+
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                return _apiResponse;
             }
-            Part partIsExists = await _unitOfWork.partRepository.Get(filter:x=>x.PartName.ToLower() == partCreateDTO.PartName.ToLower(),tracked:false);
-            if (partIsExists != null)
+            catch (Exception ex)
             {
-                return BadRequest("part already exists");
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                return _apiResponse;
             }
-            Part partToDb = _mapper.Map<Part>(partCreateDTO);
-            await _unitOfWork.partRepository.Create(partToDb);
-            await _unitOfWork.Save();
-            return Ok();
+
         }
     }
 }
