@@ -32,7 +32,7 @@ namespace BikeStore_API.Controllers
                 return NotFound();
             }
             List<CategoryDTO> categoriesDTO = _mapper.Map<List<CategoryDTO>>(categories);
-            return Ok(categories);
+            return Ok(categoriesDTO);
         }
 
     }
