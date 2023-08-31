@@ -111,7 +111,6 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
-        //FIX ISSUE HERE
         [HttpPut("update/{customerId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
