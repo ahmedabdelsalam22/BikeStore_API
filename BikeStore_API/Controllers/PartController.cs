@@ -29,7 +29,7 @@ namespace BikeStore_API.Controllers
         {
             try 
             {
-                List<Part> parts = await _unitOfWork.partRepository.GetAll();
+                List<Part> parts = await _unitOfWork.partRepository.GetAll(tracked: false);
                 if (parts == null)
                 {
                     return NotFound();
@@ -48,6 +48,24 @@ namespace BikeStore_API.Controllers
                 _apiResponse.StatusCode = HttpStatusCode.BadRequest;
                 return _apiResponse;
             }
+        }
+        [HttpGet("{partId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<APIResponse>> GetPartById(int? partId)
+        {
+            if (partId == 0 || partId == null) 
+            {
+                return BadRequest();
+            }
+            Part part = await _unitOfWork.partRepository.Get(filter:x=>x.PartId == partId ,tracked:false);
+            if (part == null) 
+            {
+                return NotFound();
+            }
+            PartDTO partDTO = _mapper.Map<PartDTO>(part);
+            return Ok(partDTO);
         }
     }
 }
