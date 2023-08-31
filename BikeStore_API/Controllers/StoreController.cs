@@ -80,21 +80,75 @@ namespace BikeStore_API.Controllers
             }
         }
         [HttpPost("create")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<APIResponse>> CreateStore([FromBody]StoreCreateDTO storeCreateDTO)
         {
-            if (storeCreateDTO == null) 
+            try 
             {
-                return BadRequest();
+                if (storeCreateDTO == null)
+                {
+                    return BadRequest();
+                }
+                var storeIsExistsInDb = await _unitOfWork.storeRepository.Get(filter: x => x.StoreName.ToLower() == storeCreateDTO.StoreName.ToLower());
+                if (storeIsExistsInDb != null)
+                {
+                    return BadRequest("store already exists");
+                }
+                Store storeToDB = _mapper.Map<Store>(storeCreateDTO);
+                await _unitOfWork.storeRepository.Create(storeToDB);
+                await _unitOfWork.Save();
+
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.Created;
+                return _apiResponse;
             }
-            var storeIsExistsInDb = await _unitOfWork.storeRepository.Get(filter:x=>x.StoreName.ToLower() == storeCreateDTO.StoreName.ToLower());
-            if (storeIsExistsInDb != null) 
+            catch (Exception ex)
             {
-                return BadRequest("store already exists");
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                return _apiResponse;
             }
-            Store storeToDB = _mapper.Map<Store>(storeCreateDTO);
-            await _unitOfWork.storeRepository.Create(storeToDB);
-            await _unitOfWork.Save();
-            return Ok();
+        }
+        [HttpPut("update/{storeId}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status304NotModified)]
+        public async Task<ActionResult<APIResponse>> UpdateStore(int? storeId, [FromBody]StoreUpdateDTO storeUpdateDTO) 
+        {
+            try 
+            {
+                if (storeId == null || storeId == 0)
+                {
+                    return BadRequest();
+                }
+                if (storeUpdateDTO == null)
+                {
+                    return BadRequest();
+                }
+                Store storeFromDb = await _unitOfWork.storeRepository.Get(filter: x => x.StoreId == storeUpdateDTO.StoreId, tracked: false);
+                if (storeFromDb == null)
+                {
+                    return NotFound();
+                }
+                storeUpdateDTO.StoreId = (int)storeId;
+
+                Store storeToDb = _mapper.Map<Store>(storeUpdateDTO);
+                _unitOfWork.storeRepository.Update(storeToDb);
+                await _unitOfWork.Save();
+
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                return _apiResponse;
+            }
+            catch (Exception ex)
+            {
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.NotModified;
+                return _apiResponse;
+            }
         }
     }
 }
