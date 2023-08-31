@@ -55,17 +55,31 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> GetPartById(int? partId)
         {
-            if (partId == 0 || partId == null) 
+            try 
             {
-                return BadRequest();
+                if (partId == 0 || partId == null)
+                {
+                    return BadRequest();
+                }
+                Part part = await _unitOfWork.partRepository.Get(filter: x => x.PartId == partId, tracked: false);
+                if (part == null)
+                {
+                    return NotFound();
+                }
+                PartDTO partDTO = _mapper.Map<PartDTO>(part);
+
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                _apiResponse.Result = partDTO;
+                return _apiResponse;
             }
-            Part part = await _unitOfWork.partRepository.Get(filter:x=>x.PartId == partId ,tracked:false);
-            if (part == null) 
+            catch (Exception ex)
             {
-                return NotFound();
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                return _apiResponse;
             }
-            PartDTO partDTO = _mapper.Map<PartDTO>(part);
-            return Ok(partDTO);
         }
     }
 }
