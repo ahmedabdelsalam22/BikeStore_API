@@ -78,5 +78,27 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<APIResponse>> CreateCustomer([FromBody] CustomerCreateDTO customerCreateDTO) 
+        {
+            if (customerCreateDTO == null) 
+            {
+                return BadRequest();
+            }
+            var customerFromDb = await _unitOfWork.customerRepository.Get(filter:x=>x.Email.ToLower() == customerCreateDTO.Email.ToLower(),tracked:false);
+            if (customerFromDb != null)
+            {
+                return BadRequest("this customer already exists");
+            }
+            Customer customerToDb = _mapper.Map<Customer>(customerCreateDTO);
+            await _unitOfWork.customerRepository.Create(customerToDb);
+            await _unitOfWork.Save();
+            return Ok();
+        }
+     
+
     }
 }
