@@ -150,5 +150,37 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
+        [HttpDelete("delete/{storeId}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> DeleteStore(int? storeId)
+        {
+            try 
+            {
+                if (storeId == null || storeId == 0)
+                {
+                    return BadRequest();
+                }
+                Store storeFromDb = await _unitOfWork.storeRepository.Get(filter: x => x.StoreId == storeId, tracked: false);
+                if (storeFromDb == null)
+                {
+                    return NotFound();
+                }
+                _unitOfWork.storeRepository.Delete(storeFromDb);
+                await _unitOfWork.Save();
+
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                return _apiResponse;
+            }
+            catch (Exception ex)
+            {
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.NotModified;
+                return _apiResponse;
+            }
+
+        }
     }
 }
