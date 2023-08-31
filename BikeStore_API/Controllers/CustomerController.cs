@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BikeStore_API.DTOS;
 using BikeStore_API.Models;
 using BikeStore_API.Repository.UnitOfWork;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +19,19 @@ namespace BikeStore_API.Controllers
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _apiResponse = new APIResponse();
+        }
+        [HttpGet("customers")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> GetCustomers() 
+        {
+            List<Customer> customers = await _unitOfWork.customerRepository.GetAll();
+            if (customers == null) 
+            {
+                return NotFound();
+            }
+            List<CustomerDTO> customersDTO = _mapper.Map<List<CustomerDTO>>(customers);
+            return Ok(customersDTO);
         }
     }
 }
