@@ -50,7 +50,7 @@ namespace BikeStore_API.Controllers
                 return _ApiResposne;
             }
         }
-        [HttpGet("Brand{brandId}")]
+        [HttpGet("{brandId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -158,7 +158,7 @@ namespace BikeStore_API.Controllers
                 return _ApiResposne;
             }
         }
-        [HttpDelete("brand{brandId}")]
+        [HttpDelete("{brandId}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
