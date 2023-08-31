@@ -4,6 +4,7 @@ using BikeStore_API.Models;
 using BikeStore_API.Repository.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace BikeStore_API.Controllers
 {
@@ -21,15 +22,50 @@ namespace BikeStore_API.Controllers
             _apiResponse = new APIResponse();
         }
         [HttpGet("Parts")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> GetParts()
         {
-            List<Part> parts = await _unitOfWork.partRepository.GetAll();
-            if (parts == null) 
+            try 
             {
-                return NotFound();  
+                List<Part> parts = await _unitOfWork.partRepository.GetAll(tracked: false);
+                if (parts == null)
+                {
+                    return NotFound();
+                }
+                List<PartDTO> partDTOs = _mapper.Map<List<PartDTO>>(parts);
+
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                _apiResponse.Result = partDTOs;
+                return _apiResponse;
             }
-            List<PartDTO> partDTOs = _mapper.Map<List<PartDTO>>(parts);
-            return Ok(partDTOs);
+            catch (Exception ex)
+            {
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                return _apiResponse;
+            }
+        }
+        [HttpGet("{partId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<APIResponse>> GetPartById(int? partId)
+        {
+            if (partId == 0 || partId == null) 
+            {
+                return BadRequest();
+            }
+            Part part = await _unitOfWork.partRepository.Get(filter:x=>x.PartId == partId ,tracked:false);
+            if (part == null) 
+            {
+                return NotFound();
+            }
+            PartDTO partDTO = _mapper.Map<PartDTO>(part);
+            return Ok(partDTO);
         }
     }
 }
