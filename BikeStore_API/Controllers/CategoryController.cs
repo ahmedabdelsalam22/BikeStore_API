@@ -16,5 +16,19 @@ namespace BikeStore_API.Controllers
             _unitOfWork = unitOfWork;
             _apiResponse = new APIResponse();
         }
+
+        [HttpGet("categories")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> GetAllCategories()
+        {
+            List<Category> categories = await _unitOfWork.categoryRepository.GetAll();
+            if (categories == null) 
+            {
+                return NotFound();
+            }
+            return Ok(categories);
+        }
+
     }
 }
