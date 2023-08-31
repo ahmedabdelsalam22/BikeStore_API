@@ -54,17 +54,30 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> GetStoreById(int? storeId)
         {
-            if (storeId == null || storeId == 0) 
+            try 
             {
-                return BadRequest();
+                if (storeId == null || storeId == 0)
+                {
+                    return BadRequest();
+                }
+                Store store = await _unitOfWork.storeRepository.Get(filter: x => x.StoreId == storeId, tracked: false);
+                if (store == null)
+                {
+                    return NotFound();
+                }
+                StoreDTO storeDTO = _mapper.Map<StoreDTO>(store);
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                _apiResponse.Result = storeDTO;
+                return _apiResponse;
             }
-            Store store = await _unitOfWork.storeRepository.Get(filter:x=>x.StoreId == storeId,tracked:false);
-            if (store == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                return _apiResponse;
             }
-            StoreDTO storeDTO = _mapper.Map<StoreDTO>(store);
-            return Ok(storeDTO);
         }
     }
 }
