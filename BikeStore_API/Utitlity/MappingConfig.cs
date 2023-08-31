@@ -13,6 +13,7 @@ namespace BikeStore_API.Utitlity
             CreateMap<BrandCreateDTO, Brand>();
 
             CreateMap<Category, CategoryDTO>();
+            CreateMap<CategoryCreateDTO, Category>();
         }
     }
 }

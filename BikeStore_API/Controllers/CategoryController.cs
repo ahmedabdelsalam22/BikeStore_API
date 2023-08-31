@@ -87,18 +87,31 @@ namespace BikeStore_API.Controllers
 
         public async Task<ActionResult<APIResponse>> CreateCategory([FromBody] CategoryCreateDTO categoryCreateDTO)
         {
-            if (categoryCreateDTO == null) 
+            try 
             {
-                return BadRequest();
+                if (categoryCreateDTO == null)
+                {
+                    return BadRequest();
+                }
+                var categoryFromDb = await _unitOfWork.categoryRepository.Get(filter: x => x.CategoryName.ToLower() == categoryCreateDTO.CategoryName.ToLower());
+                if (categoryFromDb != null)
+                {
+                    return BadRequest("category already exists");
+                }
+                Category category = _mapper.Map<Category>(categoryCreateDTO);
+                await _unitOfWork.categoryRepository.Create(category);
+                await _unitOfWork.Save();
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                return _apiResponse;
             }
-            var categoryFromDb = await _unitOfWork.categoryRepository.Get(filter:x=>x.CategoryName.ToLower() == categoryCreateDTO.CategoryName.ToLower());
-            if (categoryFromDb != null)
+            catch (Exception e)
             {
-                return BadRequest("category already exists");
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { e.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                return _apiResponse;
             }
-            Category category = _mapper.Map<Category>(categoryCreateDTO);
-            await _unitOfWork.categoryRepository.Create(category);
-            return Ok();
         }
     }
 }
