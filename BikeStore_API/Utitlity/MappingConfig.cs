@@ -23,6 +23,8 @@ namespace BikeStore_API.Utitlity
             CreateMap<Store, StoreDTO>();
             CreateMap<StoreCreateDTO, Store>();
             CreateMap<StoreUpdateDTO, Store>();
+
+            CreateMap<Part, PartDTO>();
         }
     }
 }
