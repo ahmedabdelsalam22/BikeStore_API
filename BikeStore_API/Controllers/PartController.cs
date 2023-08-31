@@ -150,9 +150,29 @@ namespace BikeStore_API.Controllers
             {
                 _apiResponse.IsSuccess = false;
                 _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
-                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                _apiResponse.StatusCode = HttpStatusCode.NotModified;
                 return _apiResponse;
             }
         }
+        [HttpDelete("delete/{partId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<APIResponse>> DeletePart(int? partId)
+        {
+            if (partId == 0 || partId == null)
+            {
+                return BadRequest();
+            }
+            Part part = await _unitOfWork.partRepository.Get(filter: x => x.PartId == partId, tracked: false);
+            if (part == null)
+            {
+                return BadRequest();
+            }
+            _unitOfWork.partRepository.Delete(part);
+            await _unitOfWork.Save();
+            return Ok();
+        }
+
     }
 }
