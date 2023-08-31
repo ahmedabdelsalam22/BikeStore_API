@@ -28,7 +28,7 @@ namespace BikeStore_API.Controllers
         {
             try 
             {
-                List<Customer> customers = await _unitOfWork.customerRepository.GetAll();
+                List<Customer> customers = await _unitOfWork.customerRepository.GetAll(tracked: false);
                 if (customers == null)
                 {
                     return NotFound();
@@ -48,9 +48,13 @@ namespace BikeStore_API.Controllers
             }
         }
         [HttpGet("{customerId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> GetCustomerById(int? customerId)
         {
-            try {
+            try
+            {
                 if (customerId == 0 || customerId == null)
                 {
                     return BadRequest();

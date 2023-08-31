@@ -30,7 +30,7 @@ namespace BikeStore_API.Controllers
         {
             try 
             {
-                List<Category> categories = await _unitOfWork.categoryRepository.GetAll();
+                List<Category> categories = await _unitOfWork.categoryRepository.GetAll(tracked:false);
                 if (categories == null)
                 {
                     return NotFound();
@@ -61,7 +61,7 @@ namespace BikeStore_API.Controllers
                 {
                     return NotFound();
                 }
-                Category category = await _unitOfWork.categoryRepository.Get(filter: x => x.CategoryId == categoryId);
+                Category category = await _unitOfWork.categoryRepository.Get(filter: x => x.CategoryId == categoryId, tracked: false);
                 if (category == null)
                 {
                     return NotFound();
@@ -92,7 +92,7 @@ namespace BikeStore_API.Controllers
                 {
                     return BadRequest();
                 }
-                var categoryFromDb = await _unitOfWork.categoryRepository.Get(filter: x => x.CategoryName.ToLower() == categoryCreateDTO.CategoryName.ToLower());
+                var categoryFromDb = await _unitOfWork.categoryRepository.Get(filter: x => x.CategoryName.ToLower() == categoryCreateDTO.CategoryName.ToLower(), tracked: false);
                 if (categoryFromDb != null)
                 {
                     return BadRequest("category already exists");
