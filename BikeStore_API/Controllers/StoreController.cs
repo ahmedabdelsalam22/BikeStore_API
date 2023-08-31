@@ -4,6 +4,7 @@ using BikeStore_API.Models;
 using BikeStore_API.Repository.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace BikeStore_API.Controllers
 {
@@ -26,13 +27,27 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> GetAllStores() 
         {
-            List<Store> stores = await _unitOfWork.storeRepository.GetAll(tracked:false);
-            if (stores == null) 
+            try 
             {
-                return NotFound();
+                List<Store> stores = await _unitOfWork.storeRepository.GetAll(tracked: false);
+                if (stores == null)
+                {
+                    return NotFound();
+                }
+                List<StoreDTO> storeDTOs = _mapper.Map<List<StoreDTO>>(stores);
+
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                _apiResponse.Result = storeDTOs;
+                return _apiResponse;
             }
-            List<StoreDTO> storeDTOs = _mapper.Map<List<StoreDTO>>(stores);
-            return Ok(storeDTOs);
+            catch (Exception ex)
+            {
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                return _apiResponse;
+            }
         }
 
     }
