@@ -78,7 +78,7 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
-        [HttpPost]
+        [HttpPost("create")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -116,7 +116,7 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<APIResponse>> UpdateCustomer(int? customerId, [FromBody] CustomerUpdateDTO customerUpdateDTO)
+        public async Task<ActionResult<APIResponse>> UpdateCustomer(int? customerId,[FromBody]CustomerUpdateDTO customerUpdateDTO)
         {
             try 
             {
@@ -128,7 +128,7 @@ namespace BikeStore_API.Controllers
                 {
                     return BadRequest();
                 }
-                Customer customerFromDb = await _unitOfWork.customerRepository.Get(filter: x => x.CustomerId == customerUpdateDTO.CustomerId);
+                Customer customerFromDb = await _unitOfWork.customerRepository.Get(filter: x => x.CustomerId == customerUpdateDTO.CustomerId,tracked:false);
                 if (customerFromDb == null)
                 {
                     return BadRequest();
@@ -157,18 +157,31 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> DeleteCustomer(int? customerId)
         {
-            if (customerId == 0 || customerId == null)
+            try 
             {
-                return BadRequest();
+                if (customerId == 0 || customerId == null)
+                {
+                    return BadRequest();
+                }
+                Customer customerFromDb = await _unitOfWork.customerRepository.Get(filter: x => x.CustomerId == customerId);
+                if (customerFromDb == null)
+                {
+                    return NotFound();
+                }
+                _unitOfWork.customerRepository.Delete(customerFromDb);
+                await _unitOfWork.Save();
+
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                return _apiResponse;
             }
-            Customer customerFromDb = await _unitOfWork.customerRepository.Get(filter: x => x.CustomerId == customerId);
-            if(customerFromDb == null) 
+            catch (Exception ex)
             {
-                return NotFound();
+                _apiResponse.IsSuccess = false;
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                return _apiResponse;
             }
-            _unitOfWork.customerRepository.Delete(customerFromDb);
-            await _unitOfWork.Save();
-            return Ok();
         }
     }
 }
