@@ -120,26 +120,59 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> UpdatePart(int? partId, [FromBody]PartUpdateDTO partUpdateDTO)
         {
+            try 
+            {
+                if (partId == 0 || partId == null)
+                {
+                    return BadRequest();
+                }
+                if (partUpdateDTO == null)
+                {
+                    return BadRequest();
+                }
+                Part partIsExists = await _unitOfWork.partRepository.Get(filter: x => x.PartId == partId, tracked: false);
+                if (partIsExists != null)
+                {
+                    return BadRequest("part already exists");
+                }
+
+                partUpdateDTO.PartId = (int)partId;
+
+                Part partToDb = _mapper.Map<Part>(partUpdateDTO);
+                _unitOfWork.partRepository.Update(partToDb);
+                await _unitOfWork.Save();
+
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                return _apiResponse;
+            }
+            catch (Exception ex)
+            {
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.NotModified;
+                return _apiResponse;
+            }
+        }
+        [HttpDelete("delete/{partId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<APIResponse>> DeletePart(int? partId)
+        {
             if (partId == 0 || partId == null)
             {
                 return BadRequest();
             }
-            if (partUpdateDTO == null)
+            Part part = await _unitOfWork.partRepository.Get(filter: x => x.PartId == partId, tracked: false);
+            if (part == null)
             {
                 return BadRequest();
             }
-            Part partIsExists = await _unitOfWork.partRepository.Get(filter: x => x.PartId == partId, tracked: false);
-            if (partIsExists != null)
-            {
-                return BadRequest("part already exists");
-            }
-
-            partUpdateDTO.PartId = (int)partId;
-
-            Part partToDb = _mapper.Map<Part>(partUpdateDTO);
-            _unitOfWork.partRepository.Update(partToDb);
+            _unitOfWork.partRepository.Delete(part);
             await _unitOfWork.Save();
             return Ok();
         }
+
     }
 }
