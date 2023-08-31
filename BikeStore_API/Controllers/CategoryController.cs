@@ -119,24 +119,36 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> UpdateCategory(int? categoryId, [FromBody]CategoryUpdateDTO categoryUpdateDTO )
         {
-            if (categoryId == 0 || categoryId == null)
+            try
             {
-                return NotFound();
+                if (categoryId == 0 || categoryId == null)
+                {
+                    return NotFound();
+                }
+                if (categoryUpdateDTO == null)
+                {
+                    return BadRequest();
+                }
+                Category categoryFromDb = await _unitOfWork.categoryRepository.Get(filter: x => x.CategoryId == categoryId, tracked: false);
+                if (categoryFromDb == null)
+                {
+                    return BadRequest();
+                }
+                categoryUpdateDTO.CategoryId = (int)categoryId;
+                Category categoryToDB = _mapper.Map<Category>(categoryUpdateDTO);
+                _unitOfWork.categoryRepository.Update(categoryToDB);
+                await _unitOfWork.Save();
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                return _apiResponse;
             }
-            if (categoryUpdateDTO == null) 
+            catch (Exception e)
             {
-                return BadRequest();
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { e.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                return _apiResponse;
             }
-            Category categoryFromDb = await _unitOfWork.categoryRepository.Get(filter:x=>x.CategoryId == categoryId,tracked:false);
-            if (categoryFromDb == null) 
-            {
-                return BadRequest();
-            }
-            categoryUpdateDTO.CategoryId = (int)categoryId;
-            Category categoryToDB = _mapper.Map<Category>(categoryUpdateDTO); 
-            _unitOfWork.categoryRepository.Update(categoryToDB);
-            await _unitOfWork.Save();
-            return Ok();
         }
 
     }
