@@ -111,7 +111,7 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
-
+        //FIX ISSUE HERE
         [HttpPut("update/{customerId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -145,10 +145,31 @@ namespace BikeStore_API.Controllers
             catch (Exception ex)
             {
                 _apiResponse.IsSuccess = false;
-                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                _apiResponse.StatusCode = HttpStatusCode.NotModified;
                 _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
                 return _apiResponse;
             }
         }
+
+        [HttpDelete("delete/{customerId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> DeleteCustomer(int? customerId)
+        {
+            if (customerId == 0 || customerId == null)
+            {
+                return BadRequest();
+            }
+            Customer customerFromDb = await _unitOfWork.customerRepository.Get(filter: x => x.CustomerId == customerId);
+            if(customerFromDb == null) 
+            {
+                return NotFound();
+            }
+            _unitOfWork.customerRepository.Delete(customerFromDb);
+            await _unitOfWork.Save();
+            return Ok();
+        }
+
     }
 }
