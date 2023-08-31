@@ -82,19 +82,32 @@ namespace BikeStore_API.Controllers
         [HttpPost("create")]
         public async Task<ActionResult<APIResponse>> CreateStore([FromBody]StoreCreateDTO storeCreateDTO)
         {
-            if (storeCreateDTO == null) 
+            try 
             {
-                return BadRequest();
+                if (storeCreateDTO == null)
+                {
+                    return BadRequest();
+                }
+                var storeIsExistsInDb = await _unitOfWork.storeRepository.Get(filter: x => x.StoreName.ToLower() == storeCreateDTO.StoreName.ToLower());
+                if (storeIsExistsInDb != null)
+                {
+                    return BadRequest("store already exists");
+                }
+                Store storeToDB = _mapper.Map<Store>(storeCreateDTO);
+                await _unitOfWork.storeRepository.Create(storeToDB);
+                await _unitOfWork.Save();
+
+                _apiResponse.IsSuccess = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                return _apiResponse;
             }
-            var storeIsExistsInDb = await _unitOfWork.storeRepository.Get(filter:x=>x.StoreName.ToLower() == storeCreateDTO.StoreName.ToLower());
-            if (storeIsExistsInDb != null) 
+            catch (Exception ex)
             {
-                return BadRequest("store already exists");
+                _apiResponse.IsSuccess = false;
+                _apiResponse.ErrorMessages = new List<string>() { ex.ToString() };
+                _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                return _apiResponse;
             }
-            Store storeToDB = _mapper.Map<Store>(storeCreateDTO);
-            await _unitOfWork.storeRepository.Create(storeToDB);
-            await _unitOfWork.Save();
-            return Ok();
         }
     }
 }
