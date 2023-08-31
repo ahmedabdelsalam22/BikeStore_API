@@ -53,7 +53,7 @@ namespace BikeStore_API.Controllers
         [HttpGet("category{categoryId}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<APIResponse>> CategoryById(int? categoryId) 
+        public async Task<ActionResult<APIResponse>> GetCategoryById(int? categoryId) 
         {
             try
             {
@@ -80,6 +80,25 @@ namespace BikeStore_API.Controllers
                 _apiResponse.StatusCode = HttpStatusCode.BadRequest;
                 return _apiResponse;
             }
+        }
+        [HttpPost("create")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+
+        public async Task<ActionResult<APIResponse>> CreateCategory([FromBody] CategoryCreateDTO categoryCreateDTO)
+        {
+            if (categoryCreateDTO == null) 
+            {
+                return BadRequest();
+            }
+            var categoryFromDb = await _unitOfWork.categoryRepository.Get(filter:x=>x.CategoryName.ToLower() == categoryCreateDTO.CategoryName.ToLower());
+            if (categoryFromDb != null)
+            {
+                return BadRequest("category already exists");
+            }
+            Category category = _mapper.Map<Category>(categoryCreateDTO);
+            await _unitOfWork.categoryRepository.Create(category);
+            return Ok();
         }
     }
 }
