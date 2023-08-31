@@ -50,6 +50,18 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
+        [HttpGet("category{categoryId}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> CategoryById(int? categoryId) 
+        {
+            if (categoryId == 0 || categoryId == null) 
+            {
+                return NotFound();
+            }
+            Category category = await _unitOfWork.categoryRepository.Get(filter:x=>x.CategoryId == categoryId);
 
+            CategoryDTO categoryDTO = _mapper.Map<CategoryDTO>(category);
+            return Ok(categoryDTO);
+        }
     }
 }
