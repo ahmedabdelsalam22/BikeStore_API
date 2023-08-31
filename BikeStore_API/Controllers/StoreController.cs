@@ -49,6 +49,22 @@ namespace BikeStore_API.Controllers
                 return _apiResponse;
             }
         }
-
+        [HttpGet("{storeId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> GetStoreById(int? storeId)
+        {
+            if (storeId == null || storeId == 0) 
+            {
+                return BadRequest();
+            }
+            Store store = await _unitOfWork.storeRepository.Get(filter:x=>x.StoreId == storeId,tracked:false);
+            if (store == null)
+            {
+                return NotFound();
+            }
+            StoreDTO storeDTO = _mapper.Map<StoreDTO>(store);
+            return Ok(storeDTO);
+        }
     }
 }
