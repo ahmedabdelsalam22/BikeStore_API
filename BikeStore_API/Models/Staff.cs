@@ -18,6 +18,7 @@ public partial class Staff
     public byte Active { get; set; }
 
     public int StoreId { get; set; }
+    public virtual Store Store { get; set; } = null!;
 
     public int? ManagerId { get; set; }
 
