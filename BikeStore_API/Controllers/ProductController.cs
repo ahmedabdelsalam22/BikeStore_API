@@ -97,6 +97,7 @@ namespace BikeStore_API.Controllers
             product.Brand = brand!;
             product.Category = category;
 
+
             await _unitOfWork.productRepository.Create(product);
             await _unitOfWork.Save();
             return Ok();
