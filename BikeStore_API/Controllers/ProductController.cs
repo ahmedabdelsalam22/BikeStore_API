@@ -1,7 +1,9 @@
-﻿using BikeStore_API.Models;
+﻿using BikeStore_API.DTOS;
+using BikeStore_API.Models;
 using BikeStore_API.Repository.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace BikeStore_API.Controllers
 {
@@ -10,24 +12,38 @@ namespace BikeStore_API.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly APIResponse _apiResponse;
+        private readonly APIResponse _ApiResposne;
         public ProductController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _apiResponse = new APIResponse();
+            _ApiResposne = new APIResponse();
         }
         [HttpGet("allProducts")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> GetProducts() 
         {
-            List<Product> products = await _unitOfWork.productRepository.GetAll(tracked: false,
-                           includes: new string[] { "Brand", "Category" });
-            if (products == null) 
-            {
-                return NotFound();
+            try 
+            { 
+                List<Product> products = await _unitOfWork.productRepository.GetAll(tracked: false,
+                               includes: new string[] { "Brand", "Category" });
+                if (products == null) 
+                {
+                    return NotFound();
+                }
+
+                    _ApiResposne.IsSuccess = true;
+                    _ApiResposne.StatusCode = HttpStatusCode.OK;
+                    _ApiResposne.Result = products;
+                    return _ApiResposne;
             }
-            return Ok(products);
+            catch (Exception ex)
+            {
+                _ApiResposne.IsSuccess = false;
+                _ApiResposne.StatusCode = HttpStatusCode.BadRequest;
+                _ApiResposne.ErrorMessages = new List<string>() { ex.ToString() };
+                return _ApiResposne;
+            }
         }
     }
 }
