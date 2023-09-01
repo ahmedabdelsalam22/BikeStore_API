@@ -21,21 +21,21 @@ namespace BikeStore_API.Controllers
         [HttpGet("allProducts")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> GetProducts() 
+        public async Task<ActionResult<APIResponse>> GetProducts()
         {
-            try 
-            { 
+            try
+            {
                 List<Product> products = await _unitOfWork.productRepository.GetAll(tracked: false,
                                includes: new string[] { "Brand", "Category" });
-                if (products == null) 
+                if (products == null)
                 {
                     return NotFound();
                 }
 
-                    _ApiResposne.IsSuccess = true;
-                    _ApiResposne.StatusCode = HttpStatusCode.OK;
-                    _ApiResposne.Result = products;
-                    return _ApiResposne;
+                _ApiResposne.IsSuccess = true;
+                _ApiResposne.StatusCode = HttpStatusCode.OK;
+                _ApiResposne.Result = products;
+                return _ApiResposne;
             }
             catch (Exception ex)
             {
@@ -50,7 +50,7 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> GetProductById(int? productId)
         {
-            try 
+            try
             {
                 if (productId == 0 || productId == null)
                 {
@@ -74,6 +74,33 @@ namespace BikeStore_API.Controllers
                 _ApiResposne.ErrorMessages = new List<string>() { ex.ToString() };
                 return _ApiResposne;
             }
+        }
+        [HttpPost("create")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> CreateProduct([FromBody] Product product)
+        {
+            if (product == null)
+            {
+                return BadRequest();
+            }
+
+            // we must sure that related entities is exists in database 
+            Brand brand = await _unitOfWork.brandRepository.Get(filter: x => x.BrandName.ToLower() == product.Brand.BrandName.ToLower());
+            Category category = await _unitOfWork.categoryRepository.Get(filter: x => x.CategoryName.ToLower() == product.Category.CategoryName.ToLower());
+
+            if (brand == null && category == null)
+            {
+                return BadRequest();
+            }
+
+            product.Brand = brand!;
+            product.Category = category;
+
+            await _unitOfWork.productRepository.Create(product);
+            await _unitOfWork.Save();
+            return Ok();
+
         }
     }
 }
