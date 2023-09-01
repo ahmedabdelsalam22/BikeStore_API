@@ -45,5 +45,22 @@ namespace BikeStore_API.Controllers
                 return _ApiResposne;
             }
         }
+        [HttpGet("{productId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> GetProductById(int? productId)
+        {
+            if (productId == 0 || productId == null) 
+            {
+                return NotFound();
+            }
+            Product product = await _unitOfWork.productRepository.Get(tracked: false,
+                               includes: new string[] { "Brand", "Category" });
+            if (product == null)
+            {
+                return NotFound();
+            }
+            return Ok(product);
+        }
     }
 }
