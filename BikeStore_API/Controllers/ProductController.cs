@@ -50,17 +50,30 @@ namespace BikeStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> GetProductById(int? productId)
         {
-            if (productId == 0 || productId == null) 
+            try 
             {
-                return NotFound();
+                if (productId == 0 || productId == null)
+                {
+                    return NotFound();
+                }
+                Product product = await _unitOfWork.productRepository.Get(tracked: false,
+                                   includes: new string[] { "Brand", "Category" });
+                if (product == null)
+                {
+                    return NotFound();
+                }
+                _ApiResposne.IsSuccess = true;
+                _ApiResposne.StatusCode = HttpStatusCode.OK;
+                _ApiResposne.Result = product;
+                return _ApiResposne;
             }
-            Product product = await _unitOfWork.productRepository.Get(tracked: false,
-                               includes: new string[] { "Brand", "Category" });
-            if (product == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _ApiResposne.IsSuccess = false;
+                _ApiResposne.StatusCode = HttpStatusCode.BadRequest;
+                _ApiResposne.ErrorMessages = new List<string>() { ex.ToString() };
+                return _ApiResposne;
             }
-            return Ok(product);
         }
     }
 }
