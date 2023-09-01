@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BikeStore_API.Models;
 
@@ -13,6 +14,8 @@ public partial class Product
     public decimal ListPrice { get; set; }
     public virtual Brand Brand { get; set; } = null!;
     public virtual Category Category { get; set; } = null!;
-    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-    public virtual ICollection<Stock> Stocks { get; set; } = new List<Stock>();
+    [JsonIgnore]
+    public virtual ICollection<OrderItem>? OrderItems { get; set; } = new List<OrderItem>();
+    [JsonIgnore]
+    public virtual ICollection<Stock>? Stocks { get; set; } = new List<Stock>();
 }

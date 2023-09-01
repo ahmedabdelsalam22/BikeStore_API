@@ -29,9 +29,6 @@ public partial class BikeStoresContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
-    public virtual DbSet<ProductAudit> ProductAudits { get; set; }
-
-    public virtual DbSet<ProductsInfo> ProductsInfos { get; set; }
 
     public virtual DbSet<Staff> Staffs { get; set; }
 
@@ -39,7 +36,6 @@ public partial class BikeStoresContext : DbContext
 
     public virtual DbSet<Store> Stores { get; set; }
 
-    public virtual DbSet<TplEmp> TplEmps { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Data Source=DESKTOP-IG5PLK5;Initial Catalog=BikeStores;Integrated Security=True; TrustServerCertificate=true;");
@@ -215,35 +211,7 @@ public partial class BikeStoresContext : DbContext
                 .HasConstraintName("FK__products__catego__3B75D760");
         });
 
-        modelBuilder.Entity<ProductAudit>(entity =>
-        {
-            entity.HasKey(e => e.ChangeId).HasName("PK__product___F4EFE5963A831028");
-
-            entity.ToTable("product_audits", "production");
-
-            entity.Property(e => e.ChangeId).HasColumnName("change_id");
-            entity.Property(e => e.BrandId).HasColumnName("brand_id");
-            entity.Property(e => e.CategoryId).HasColumnName("category_id");
-            entity.Property(e => e.ListPrice)
-                .HasColumnType("decimal(10, 2)")
-                .HasColumnName("list_price");
-            entity.Property(e => e.ModelYear).HasColumnName("model_year");
-            entity.Property(e => e.Operation)
-                .HasMaxLength(3)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("operation");
-            entity.Property(e => e.ProductId).HasColumnName("product_id");
-            entity.Property(e => e.ProductName)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("product_name");
-            entity.Property(e => e.UpdatedAt)
-                .HasColumnType("datetime")
-                .HasColumnName("updated_at");
-        });
-
-
+       
         modelBuilder.Entity<Staff>(entity =>
         {
             entity.HasKey(e => e.StaffId).HasName("PK__staffs__1963DD9C8DDE7F17");
@@ -338,24 +306,7 @@ public partial class BikeStoresContext : DbContext
                 .HasColumnName("zip_code");
         });
 
-        modelBuilder.Entity<TplEmp>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("tpl_Emp");
-
-            entity.HasIndex(e => e.Sallary, "IX_PK_tblEmp").IsClustered();
-
-            entity.Property(e => e.City)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.Gender)
-                .HasMaxLength(10)
-                .IsUnicode(false);
-            entity.Property(e => e.Name)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-        });
+    
 
         OnModelCreatingPartial(modelBuilder);
     }
