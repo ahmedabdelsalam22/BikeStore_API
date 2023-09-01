@@ -243,24 +243,6 @@ public partial class BikeStoresContext : DbContext
                 .HasColumnName("updated_at");
         });
 
-        modelBuilder.Entity<ProductsInfo>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToView("products_info");
-
-            entity.Property(e => e.BrandName)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("brand_name");
-            entity.Property(e => e.ListPrice)
-                .HasColumnType("decimal(10, 2)")
-                .HasColumnName("list_price");
-            entity.Property(e => e.ProductName)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("product_name");
-        });
 
         modelBuilder.Entity<Staff>(entity =>
         {
