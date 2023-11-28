@@ -1,19 +1,20 @@
-﻿using BikeStore_API.Models;
+﻿using BikeStore_API.DomainModels;
 using BikeStore_API.Repository.IRepositories;
 
 namespace BikeStore_API.Repository.Repositories
 {
     public class BrandRepository : Repository<Brand>, IBrandRepository
     {
-        private readonly BikeStoresContext _context;
-        public BrandRepository(BikeStoresContext context) : base(context)
+        private readonly BikeStoresContext _db;
+
+        public BrandRepository(BikeStoresContext db) : base(db)
         {
-            _context = context;
+            _db = db;   
         }
 
         public void Update(Brand brand)
         {
-            _context.Brands.Update(brand);
+            _db.Brands.Update(brand);
         }
     }
 }

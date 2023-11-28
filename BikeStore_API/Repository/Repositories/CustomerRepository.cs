@@ -1,4 +1,4 @@
-﻿using BikeStore_API.Models;
+﻿using BikeStore_API.DomainModels;
 using BikeStore_API.Repository.IRepositories;
 
 namespace BikeStore_API.Repository.Repositories
