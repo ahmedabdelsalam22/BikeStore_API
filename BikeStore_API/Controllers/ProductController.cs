@@ -1,5 +1,5 @@
 ﻿using BikeStore_API.DTOS;
-using BikeStore_API.Models;
+using BikeStore_API.DomainModels;
 using BikeStore_API.Repository.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

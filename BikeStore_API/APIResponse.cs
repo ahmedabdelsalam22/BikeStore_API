@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace BikeStore_API.Models
+namespace BikeStore_API
 {
     public class APIResponse
     {
@@ -8,5 +8,6 @@ namespace BikeStore_API.Models
         public List<string>? ErrorMessages { get; set; } = null;
         public bool IsSuccess { get; set; }
         public Object Result { get; set; }
+
     }
 }

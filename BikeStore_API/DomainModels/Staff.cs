@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BikeStore_API.Models;
+namespace BikeStore_API.DomainModels;
 
 public partial class Staff
 {
@@ -18,7 +18,6 @@ public partial class Staff
     public byte Active { get; set; }
 
     public int StoreId { get; set; }
-    public virtual Store Store { get; set; } = null!;
 
     public int? ManagerId { get; set; }
 
@@ -28,4 +27,5 @@ public partial class Staff
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
+    public virtual Store Store { get; set; } = null!;
 }

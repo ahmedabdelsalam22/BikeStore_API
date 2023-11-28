@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BikeStore_API.Models;
+namespace BikeStore_API.DomainModels;
 
 public partial class Store
 {

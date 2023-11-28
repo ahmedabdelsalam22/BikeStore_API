@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BikeStore_API.DTOS;
-using BikeStore_API.Models;
+using BikeStore_API.DomainModels;
 
 namespace BikeStore_API.Utitlity
 {

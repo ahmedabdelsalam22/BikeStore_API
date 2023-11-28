@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace BikeStore_API.Models;
+namespace BikeStore_API.DomainModels;
 
 public partial class BikeStoresContext : DbContext
 {
@@ -16,7 +16,7 @@ public partial class BikeStoresContext : DbContext
     }
 
     public virtual DbSet<Brand> Brands { get; set; }
-
+    public virtual DbSet<Part> Parts { get; set; }
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<Customer> Customers { get; set; }
@@ -25,10 +25,7 @@ public partial class BikeStoresContext : DbContext
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
 
-    public virtual DbSet<Part> Parts { get; set; }
-
     public virtual DbSet<Product> Products { get; set; }
-
 
     public virtual DbSet<Staff> Staffs { get; set; }
 
@@ -36,15 +33,15 @@ public partial class BikeStoresContext : DbContext
 
     public virtual DbSet<Store> Stores { get; set; }
 
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Data Source=DESKTOP-IG5PLK5;Initial Catalog=BikeStores;Integrated Security=True; TrustServerCertificate=true;");
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=DESKTOP-IG5PLK5;Initial Catalog=BikeStoresAPI;Integrated Security=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Brand>(entity =>
         {
-            entity.HasKey(e => e.BrandId).HasName("PK__brands__5E5A8E2749CD41AA");
+            entity.HasKey(e => e.BrandId).HasName("PK__brands__5E5A8E27D2E78DAA");
 
             entity.ToTable("brands", "production");
 
@@ -57,7 +54,7 @@ public partial class BikeStoresContext : DbContext
 
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__categori__D54EE9B46AA0EBAC");
+            entity.HasKey(e => e.CategoryId).HasName("PK__categori__D54EE9B46C028E73");
 
             entity.ToTable("categories", "production");
 
@@ -70,7 +67,7 @@ public partial class BikeStoresContext : DbContext
 
         modelBuilder.Entity<Customer>(entity =>
         {
-            entity.HasKey(e => e.CustomerId).HasName("PK__customer__CD65CB85A317CD17");
+            entity.HasKey(e => e.CustomerId).HasName("PK__customer__CD65CB852343D8C6");
 
             entity.ToTable("customers", "sales");
 
@@ -111,7 +108,7 @@ public partial class BikeStoresContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__orders__46596229A6F335DC");
+            entity.HasKey(e => e.OrderId).HasName("PK__orders__4659622918483A50");
 
             entity.ToTable("orders", "sales");
 
@@ -147,7 +144,7 @@ public partial class BikeStoresContext : DbContext
 
         modelBuilder.Entity<OrderItem>(entity =>
         {
-            entity.HasKey(e => new { e.OrderId, e.ItemId }).HasName("PK__order_it__837942D433AAA504");
+            entity.HasKey(e => new { e.OrderId, e.ItemId }).HasName("PK__order_it__837942D496244F16");
 
             entity.ToTable("order_items", "sales");
 
@@ -171,24 +168,11 @@ public partial class BikeStoresContext : DbContext
                 .HasConstraintName("FK__order_ite__produ__4E88ABD4");
         });
 
-        modelBuilder.Entity<Part>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("parts", "production");
-
-            entity.Property(e => e.PartId).HasColumnName("part_id");
-            entity.Property(e => e.PartName)
-                .HasMaxLength(100)
-                .IsUnicode(false)
-                .HasColumnName("part_name");
-        });
-
         modelBuilder.Entity<Product>(entity =>
         {
-            entity.HasKey(e => e.ProductId).HasName("PK__products__47027DF58FDDD2F8");
+            entity.HasKey(e => e.ProductId).HasName("PK__products__47027DF52C5A4F93");
 
-            entity.ToTable("products", "production", tb => tb.HasTrigger("trg_product_audit"));
+            entity.ToTable("products", "production");
 
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.BrandId).HasColumnName("brand_id");
@@ -211,14 +195,13 @@ public partial class BikeStoresContext : DbContext
                 .HasConstraintName("FK__products__catego__3B75D760");
         });
 
-       
         modelBuilder.Entity<Staff>(entity =>
         {
-            entity.HasKey(e => e.StaffId).HasName("PK__staffs__1963DD9C8DDE7F17");
+            entity.HasKey(e => e.StaffId).HasName("PK__staffs__1963DD9C60C771BD");
 
             entity.ToTable("staffs", "sales");
 
-            entity.HasIndex(e => e.Email, "UQ__staffs__AB6E61649ED62473").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__staffs__AB6E61642343DB00").IsUnique();
 
             entity.Property(e => e.StaffId).HasColumnName("staff_id");
             entity.Property(e => e.Active).HasColumnName("active");
@@ -252,7 +235,7 @@ public partial class BikeStoresContext : DbContext
 
         modelBuilder.Entity<Stock>(entity =>
         {
-            entity.HasKey(e => new { e.StoreId, e.ProductId }).HasName("PK__stocks__E68284D30D5A0BC0");
+            entity.HasKey(e => new { e.StoreId, e.ProductId }).HasName("PK__stocks__E68284D3FEC7AEA2");
 
             entity.ToTable("stocks", "production");
 
@@ -271,7 +254,7 @@ public partial class BikeStoresContext : DbContext
 
         modelBuilder.Entity<Store>(entity =>
         {
-            entity.HasKey(e => e.StoreId).HasName("PK__stores__A2F2A30CB5368569");
+            entity.HasKey(e => e.StoreId).HasName("PK__stores__A2F2A30C7A17A63F");
 
             entity.ToTable("stores", "sales");
 
@@ -305,8 +288,6 @@ public partial class BikeStoresContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("zip_code");
         });
-
-    
 
         OnModelCreatingPartial(modelBuilder);
     }
